@@ -3,19 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package iar.busqueda;
+package iar.busqueda.logica;
 
 /**
  *
  * @author Andres
  */
-public class IARBusqueda {
+public class IARSearchMain {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
-    }
+  
     
 }
