@@ -108,6 +108,7 @@ public class GuiSearchTree extends javax.swing.JFrame {
         btn_salir = new javax.swing.JButton();
         combo_metodo = new javax.swing.JComboBox<>();
         jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
 
@@ -150,7 +151,7 @@ public class GuiSearchTree extends javax.swing.JFrame {
                 {null, null, null}
             },
             new String [] {
-                "Lista Abierta", "", "Lista Cerrada"
+                "m =", "Lista Abierta", "Lista Cerrada"
             }
         ) {
             Class[] types = new Class [] {
@@ -231,7 +232,7 @@ public class GuiSearchTree extends javax.swing.JFrame {
             }
         });
 
-        btn_buscar.setText("Buscar");
+        btn_buscar.setText("Recorrer");
         btn_buscar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_buscarActionPerformed(evt);
@@ -266,6 +267,13 @@ public class GuiSearchTree extends javax.swing.JFrame {
             }
         });
 
+        jButton2.setText("Buscar");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnl_opcionesLayout = new javax.swing.GroupLayout(pnl_opciones);
         pnl_opciones.setLayout(pnl_opcionesLayout);
         pnl_opcionesLayout.setHorizontalGroup(
@@ -276,10 +284,12 @@ public class GuiSearchTree extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btn_talar)
                 .addGap(61, 61, 61)
-                .addComponent(combo_metodo, javax.swing.GroupLayout.PREFERRED_SIZE, 248, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(combo_metodo, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btn_buscar)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 107, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 57, Short.MAX_VALUE)
                 .addComponent(jButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btn_salir)
@@ -295,7 +305,8 @@ public class GuiSearchTree extends javax.swing.JFrame {
                     .addComponent(btn_talar)
                     .addComponent(btn_salir)
                     .addComponent(combo_metodo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
+                    .addComponent(jButton1)
+                    .addComponent(jButton2))
                 .addContainerGap())
         );
 
@@ -424,7 +435,7 @@ public class GuiSearchTree extends javax.swing.JFrame {
     private void btn_buscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_buscarActionPerformed
         clearTable();
         Object opcion = this.combo_metodo.getSelectedItem();
-        String recorrido=null;
+        //String recorrido=null;
         if(opcion.equals("Búsqueda Primero en Anchura"))
             //recorrido=this.grafo.firstWidth();
             primeroEnAnchura();
@@ -448,6 +459,18 @@ public class GuiSearchTree extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         clearTable();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        clearTable();
+        Object opcion = this.combo_metodo.getSelectedItem();
+        String nombre = ventana.leerCadena("Ingrese nombre del nodo a buscar:");  
+        if(opcion.equals("Búsqueda Primero en Anchura")){
+            this.primeroEnAnchura(nombre);
+        }
+        if(opcion.equals("Búsqueda Primero en Profundidad")){
+            this.primeroEnProfundidad(nombre);
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
                                       
     private void clearTable(){
         for(int i=0;i<jTable1.getRowCount();i++){
@@ -483,6 +506,40 @@ public class GuiSearchTree extends javax.swing.JFrame {
             {
                 break;
             }
+        }
+    }
+    
+    private void primeroEnAnchura(String nombre){
+        Iterator<iar.busqueda.gui.util.Node> breadthIterator = tree.iterator("A", TraversalStrategy.BREADTH_FIRST);
+        int x=0;String hijos="",cadena="";
+        while (breadthIterator.hasNext()) {
+            
+            Node node = breadthIterator.next();
+            jTable1.setValueAt(node.getIdentifier(), x, 0);
+            
+            if (node.getIdentifier().compareTo(nombre) == 0) {
+                break;
+            } else {
+            
+            if((x-1)>=0) {
+                Object o=jTable1.getValueAt((x - 1), 1);
+                jTable1.setValueAt(listaAbierta(node,o.toString()), x, 1);
+                cadena+=jTable1.getValueAt(x-1, 0).toString();
+                jTable1.setValueAt(cadena+jTable1.getValueAt((x), 0), x, 2);
+            }
+            else {
+                for(int i=0;i<node.getChildren().size();i++){
+                    hijos+=node.getChildren().get(i);
+                }
+                jTable1.setValueAt(hijos, 0, 1);
+            }
+            hijos="";
+            x++;
+              if(node.isGoal())
+            {
+                break;
+            }
+            } 
         }
     }
     
@@ -522,6 +579,48 @@ public class GuiSearchTree extends javax.swing.JFrame {
                 x++;
         }    
     }
+     
+    private void primeroEnProfundidad(String nombre){
+        
+        Iterator<iar.busqueda.gui.util.Node> breadthIterator = tree.iterator("A", TraversalStrategy.DEPTH_FIRST);
+        int x=0;String hijos="",cadena="",cadenaCerrada="";
+        while (breadthIterator.hasNext()) {
+
+            Node node = breadthIterator.next();
+            jTable1.setValueAt(node.getIdentifier(), x, 0);
+          
+            if (node.getIdentifier().compareTo(nombre) == 0) {
+                break;
+            } else {
+            
+
+            if((x-1)>=0) {
+               Object o=jTable1.getValueAt((x - 1), 1);
+               for(int i=0;i<node.getChildren().size();i++){
+                   cadena+=node.getChildren().get(i);
+                }
+               cadena+=o.toString().substring(1, o.toString().length());
+                jTable1.setValueAt(cadena, x, 1);
+              cadenaCerrada+=jTable1.getValueAt(x-1, 0).toString();
+                jTable1.setValueAt(cadenaCerrada+jTable1.getValueAt((x), 0), x, 2);
+               cadena="";
+            }
+            else {
+                for(int i=0;i<node.getChildren().size();i++){
+                    hijos+=node.getChildren().get(i);
+                }
+                jTable1.setValueAt(hijos, 0, 1);
+            }
+               if(node.isGoal())
+            {
+                break;
+            }
+            hijos="";
+
+                x++;
+        }    
+        }
+    } 
      
      private String listaAbierta(Node node, String filaAnterior){
        String cadena="";
@@ -573,6 +672,7 @@ public class GuiSearchTree extends javax.swing.JFrame {
     private javax.swing.JButton btn_talar;
     private javax.swing.JComboBox<String> combo_metodo;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
